@@ -461,3 +461,84 @@ class Bed(models.Model):
 
     def __str__(self):
         return f"{self.hospital.name} - Bed {self.bed_number}"
+
+
+
+class BedReservation(models.Model):
+    class Status(models.TextChoices):
+        ACTIVE = "ACTIVE", "Active"
+        CONFIRMED = "CONFIRMED", "Confirmed"
+        EXPIRED = "EXPIRED", "Expired"
+        CANCELLED = "CANCELLED", "Cancelled"
+        CONVERTED_TO_OCCUPIED = "CONVERTED_TO_OCCUPIED", "Converted to Occupied"
+
+    bed = models.ForeignKey(
+        Bed,
+        on_delete=models.CASCADE,
+        related_name="reservations"
+    )
+    patient = models.ForeignKey(
+        Patient,
+        on_delete=models.CASCADE,
+        related_name="bed_reservations"
+    )
+    reserved_at = models.DateTimeField(auto_now_add=True)
+    expected_arrival = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(
+        max_length=30,
+        choices=Status.choices,
+        default=Status.ACTIVE
+    )
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.patient.patient_id} - Bed {self.bed.bed_number}"
+
+
+class AdmissionQueueEntry(models.Model):
+    class Priority(models.TextChoices):
+        CRITICAL = "CRITICAL", "Critical"
+        URGENT = "URGENT", "Urgent"
+        NORMAL = "NORMAL", "Normal"
+
+    class Status(models.TextChoices):
+        WAITING = "WAITING", "Waiting"
+        BED_RESERVED = "BED_RESERVED", "Bed Reserved"
+        ADMITTED = "ADMITTED", "Admitted"
+        CANCELLED = "CANCELLED", "Cancelled"
+
+    patient = models.ForeignKey(
+        Patient,
+        on_delete=models.CASCADE,
+        related_name="admission_queue_entries"
+    )
+    hospital = models.ForeignKey(
+        Hospital,
+        on_delete=models.CASCADE,
+        related_name="admission_queue"
+    )
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.CASCADE,
+        related_name="admission_queue_entries"
+    )
+    requested_bed_type = models.CharField(
+        max_length=20,
+        choices=Bed.BedType.choices
+    )
+    priority = models.CharField(
+        max_length=10,
+        choices=Priority.choices,
+        default=Priority.NORMAL
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.WAITING
+    )
+    requested_at = models.DateTimeField(auto_now_add=True)
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.patient.patient_id} - {self.requested_bed_type} - {self.priority}"
