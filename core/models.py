@@ -295,3 +295,169 @@ class QueueEntry(models.Model):
 
     def __str__(self):
         return f"Token {self.token_number} - {self.patient.patient_id}"
+
+
+class EmergencyCase(models.Model):
+
+    class Priority(models.TextChoices):
+        P1 = "P1", "Critical"
+        P2 = "P2", "Urgent"
+        P3 = "P3", "Lower Urgency"
+
+    class Status(models.TextChoices):
+        REGISTERED = "REGISTERED", "Registered"
+        TRIAGED = "TRIAGED", "Triaged"
+        WAITING = "WAITING", "Waiting"
+        IN_TREATMENT = "IN_TREATMENT", "In Treatment"
+        COMPLETED = "COMPLETED", "Completed"
+        TRANSFERRED = "TRANSFERRED", "Transferred"
+
+    patient = models.ForeignKey(
+        Patient,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="emergency_cases",
+    )
+
+    hospital = models.ForeignKey(
+        Hospital,
+        on_delete=models.CASCADE,
+        related_name="emergency_cases",
+    )
+
+    emergency_id = models.CharField(
+        max_length=30,
+        unique=True,
+    )
+
+    priority = models.CharField(
+        max_length=2,
+        choices=Priority.choices,
+        null=True,
+        blank=True,
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.REGISTERED,
+    )
+
+    arrival_time = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    notes = models.TextField(
+        blank=True,
+    )
+
+    def __str__(self):
+        return self.emergency_id
+
+class EmergencyCase(models.Model):
+    class Priority(models.TextChoices):
+        P1 = "P1", "Critical"
+        P2 = "P2", "Urgent"
+        P3 = "P3", "Lower Urgency"
+
+    class Status(models.TextChoices):
+        REGISTERED = "REGISTERED", "Registered"
+        TRIAGED = "TRIAGED", "Triaged"
+        WAITING = "WAITING", "Waiting"
+        IN_TREATMENT = "IN_TREATMENT", "In Treatment"
+        COMPLETED = "COMPLETED", "Completed"
+        TRANSFERRED = "TRANSFERRED", "Transferred"
+
+    patient = models.ForeignKey(
+        Patient,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="emergency_cases",
+    )
+
+    hospital = models.ForeignKey(
+        Hospital,
+        on_delete=models.CASCADE,
+        related_name="emergency_cases",
+    )
+
+    emergency_id = models.CharField(
+        max_length=30,
+        unique=True
+    )
+
+    priority = models.CharField(
+        max_length=2,
+        choices=Priority.choices,
+        null=True,
+        blank=True,
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.REGISTERED,
+    )
+
+    arrival_time = models.DateTimeField(auto_now_add=True)
+
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.emergency_id
+
+
+class Bed(models.Model):
+    class BedType(models.TextChoices):
+        GENERAL = "GENERAL", "General"
+        SEMI_PRIVATE = "SEMI_PRIVATE", "Semi Private"
+        PRIVATE = "PRIVATE", "Private"
+        ICU = "ICU", "ICU"
+        EMERGENCY = "EMERGENCY", "Emergency"
+
+    class Status(models.TextChoices):
+        AVAILABLE = "AVAILABLE", "Available"
+        RESERVED = "RESERVED", "Reserved"
+        OCCUPIED = "OCCUPIED", "Occupied"
+        CLEANING = "CLEANING", "Cleaning"
+        MAINTENANCE = "MAINTENANCE", "Maintenance"
+        OUT_OF_SERVICE = "OUT_OF_SERVICE", "Out of Service"
+
+    hospital = models.ForeignKey(
+        Hospital,
+        on_delete=models.CASCADE,
+        related_name="beds",
+    )
+
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.CASCADE,
+        related_name="beds",
+    )
+
+    bed_number = models.CharField(max_length=20)
+
+    bed_type = models.CharField(
+        max_length=20,
+        choices=BedType.choices,
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.AVAILABLE,
+    )
+
+    floor = models.CharField(max_length=20, blank=True)
+
+    room_number = models.CharField(max_length=20, blank=True)
+
+    is_active = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.hospital.name} - Bed {self.bed_number}"
