@@ -11,7 +11,7 @@ A real-time multi-hospital patient-flow and resource-management platform.
 - Real-time: WebSockets / Django Channels
 - API Testing: Postman
 
-## Core Modules
+## Core Modules 
 
 - Patient Management
 - Hospital Management
