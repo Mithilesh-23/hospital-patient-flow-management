@@ -355,60 +355,6 @@ class EmergencyCase(models.Model):
     def __str__(self):
         return self.emergency_id
 
-class EmergencyCase(models.Model):
-    class Priority(models.TextChoices):
-        P1 = "P1", "Critical"
-        P2 = "P2", "Urgent"
-        P3 = "P3", "Lower Urgency"
-
-    class Status(models.TextChoices):
-        REGISTERED = "REGISTERED", "Registered"
-        TRIAGED = "TRIAGED", "Triaged"
-        WAITING = "WAITING", "Waiting"
-        IN_TREATMENT = "IN_TREATMENT", "In Treatment"
-        COMPLETED = "COMPLETED", "Completed"
-        TRANSFERRED = "TRANSFERRED", "Transferred"
-
-    patient = models.ForeignKey(
-        Patient,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="emergency_cases",
-    )
-
-    hospital = models.ForeignKey(
-        Hospital,
-        on_delete=models.CASCADE,
-        related_name="emergency_cases",
-    )
-
-    emergency_id = models.CharField(
-        max_length=30,
-        unique=True
-    )
-
-    priority = models.CharField(
-        max_length=2,
-        choices=Priority.choices,
-        null=True,
-        blank=True,
-    )
-
-    status = models.CharField(
-        max_length=20,
-        choices=Status.choices,
-        default=Status.REGISTERED,
-    )
-
-    arrival_time = models.DateTimeField(auto_now_add=True)
-
-    notes = models.TextField(blank=True)
-
-    def __str__(self):
-        return self.emergency_id
-
-
 class Bed(models.Model):
     class BedType(models.TextChoices):
         GENERAL = "GENERAL", "General"
